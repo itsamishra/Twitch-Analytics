@@ -2,3 +2,4 @@ venv/
 .vscode/
 secret.json
 __pycache__
+*.pyc

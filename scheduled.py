@@ -5,16 +5,29 @@ import json
 from pypika import Query, Table
 import psycopg2
 import datetime
+import schedule
+import time
+
 
 # Schedules functions to run at appropriate time intervals
 def schedule_scripts(secret_dict):
     print("scheduling...")
     twitch_analytics_secrets = secret_dict["twitch-analytics"]
-    get_twitch_viewership_data(twitch_analytics_secrets)
+
+    # Schedules insertion of twitch viewship data every 10 seconds
+    schedule.every(10).seconds.do(
+        get_twitch_viewership_data, twitch_analytics_secrets=twitch_analytics_secrets
+    )
+
+    # Runs schedule
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
 
 # Retreives top 20 streams from Twitch API and inserts them into db
 def get_twitch_viewership_data(twitch_analytics_secrets):
+    print("getting data...")
     endpoint = "https://api.twitch.tv/helix/streams?first=10"
     headers = {"Client-Id": twitch_analytics_secrets["twitch-client-id"]}
     top_streams = []
@@ -38,7 +51,10 @@ def get_twitch_viewership_data(twitch_analytics_secrets):
     timestamp = str(datetime.datetime.now())
     for stream in top_streams:
         insert_stream_data_query = insert_stream_data_query.insert(
-            stream["viewer_count"], stream["streamer_name"], stream["stream_title"], timestamp
+            stream["viewer_count"],
+            stream["streamer_name"],
+            stream["stream_title"],
+            timestamp,
         )
     insert_stream_data_query = insert_stream_data_query.get_sql()
 
