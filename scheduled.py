@@ -18,7 +18,7 @@ def schedule_scripts(secret_dict):
     schedule.every(10).seconds.do(
         get_twitch_viewership_data, twitch_analytics_secrets=twitch_analytics_secrets
     )
-    delete_old_stream_data()
+    # delete_old_stream_data()
 
     # Runs schedule
     while True:

@@ -2,9 +2,8 @@
 #   DONE: Make sure that data from function is stored in postgres
 #   DONE: Add function to scheduler that runs function every 10 seconds
 # TODO: Add function that delets all records >24 hours old
-# TODO: Add front end that uses stream data
-# TODO: Move workout-app secret from environment variable to secret.json
-# TODO: Add security to database that allows only my ec2's ip to access it (as well as my personal ip)
+# DONE: Add front end that uses stream data
+# DONE: Move workout-app secret from environment variable to secret.json
 
 from flask import Flask, render_template, jsonify
 from scheduled import *
