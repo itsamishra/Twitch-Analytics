@@ -18,7 +18,7 @@ def schedule_scripts(secret_dict):
     schedule.every(10).seconds.do(
         get_twitch_viewership_data, twitch_analytics_secrets=twitch_analytics_secrets
     )
-    # delete_old_stream_data()
+    delete_old_stream_data()
 
     # Runs schedule
     while True:
@@ -43,9 +43,9 @@ def get_twitch_viewership_data(twitch_analytics_secrets):
             "streamer_name": raw_stream_data["user_name"],
             "stream_title": raw_stream_data["title"],
             "started_at": raw_stream_data["started_at"],
-            "rank": rank
+            "rank": rank,
         }
-        
+
         top_streams.append(stream_data)
 
     # Creates SQL query
@@ -60,7 +60,7 @@ def get_twitch_viewership_data(twitch_analytics_secrets):
             stream["streamer_name"],
             stream["stream_title"],
             timestamp,
-            stream["rank"]
+            stream["rank"],
         )
     insert_stream_data_query = insert_stream_data_query.get_sql()
 

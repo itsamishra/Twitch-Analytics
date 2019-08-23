@@ -25,15 +25,14 @@ def get_all_stream_data(twitch_analytics_secrets):
     rank_set = set()
     for stream in top_streams_list:
         rank_set.add(stream[4])
-    
+
     # Initializes rank dictionary
     rank_dict = {}
     for r in rank_set:
         rank_dict[r] = []
-    
+
     # Adds to rank dictionary
     for stream in top_streams_list:
         rank_dict[stream[4]].append(stream)
-                
 
     return rank_dict

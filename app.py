@@ -19,7 +19,6 @@ with open("secret.json", "r") as secret_json:
     secret_dict = json.load(secret_json)
 
 # Schedules all scripts
-# schedule_scripts(secret_dict)
 thread = threading.Thread(target=schedule_scripts, args=(secret_dict,))
 thread.start()
 

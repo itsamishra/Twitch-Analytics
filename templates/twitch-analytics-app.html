@@ -14,70 +14,62 @@
 </head>
 
 <body>
-    TEST
     <div id="chartContainer" style="height: 370px; width: 100%;"></div>
 
 
     <script>
-        // function getRankDict() {
-        //     $.get("/project/twitch-analytics/api/get-stream-data", function onSuccess(data, status) {
-        //         datapoints = []
-        //         for (let i = 0; i < data["1"].length; i++) {
-        //             let numViewers = data["1"][i][0];
-        //             let timestamp = data["1"][i][3];
-        //             console.log(`${numViewers}, ${timestamp}`)
-        //             datapoints.push({ x: new Date(timestamp), y: numViewers });
-
-        //             if (i === 25) {
-        //                 break
-        //             }
-        //         }
-        //         console.log(datapoints)
-        //         console.log(datapoints[0])
-        //         console.log(datapoints[1])
-        //         console.log(datapoints[2])
-        //     });
-        // }
-
-        function getRankDict() {
+        // Returns stream data
+        function getStreamData() {
             return new Promise((resolve, reject) => {
                 $.get("/project/twitch-analytics/api/get-stream-data", function onSuccess(data, status) {
-                    resolve(data);
+                    // Creates list of all ranks
+                    rank_list = Object.keys(data);
+
+                    // Creates list of all data
+                    let data_list = [];
+                    // Iterates over all ranks
+                    for (let j = 0; j < rank_list.length; j++) {
+                        let rank = rank_list[j];
+
+                        // Creates JS object containing rank's data
+                        let rank_data = {
+                            yValueFormatString: "###,###,### Viewers",
+                            xValueFormatString: "HH:mmtt K MMMM DD, YYYY",
+                            type: "spline",
+                            dataPoints: []
+                        }
+                        // Adds rank's data 
+                        for (let i = 0; i < data["1"].length; i++) {
+                            let viewerCount = data[rank][i][0];
+                            let timestamp = data[rank][i][3];
+
+                            rank_data["dataPoints"].push({ x: new Date(timestamp), y: viewerCount });
+                        }
+
+                        // Pushes rank's data to list
+                        data_list.push(rank_data);
+                    }
+
+                    resolve(data_list);
                 })
             })
         }
 
-        getRankDict().then(function (data) {
-            // console.log(data)
+        // Updates graph
+        function updateGraph() {
+            console.log("running updateGraph()...");
+            getStreamData().then(function (stream_data) {
+                chart["options"]["data"] = stream_data;
+                chart.render();
+            });
+        }
 
-            // let rank_data = 
-            let rank_data = {
-                yValueFormatString: "###,###,### Viewers",
-                xValueFormatString: "HH:mmtt K MMMM DD, YYYY",
-                type: "spline",
-                dataPoints: []
-            }
-            for (let i = 0; i < data["1"].length; i++) {
-                // console.log(data["1"][i])
-                let viewerCount = data["1"][i][0];
-                let timestamp = data["1"][i][3];
-                console.log(`${viewerCount}, ${timestamp}`);
-                rank_data["dataPoints"].push({ x: new Date(timestamp), y: viewerCount });
-            }
-            console.log(rank_data);
-
-            // let rank_data = {
-            //     yValueFormatString: "###,###,### Viewers",
-            //     xValueFormatString: "HH:mmtt K MMMM DD, YYYY",
-            //     type: "spline",
-            //     dataPoints: [
-            //         { x: new Date("Thu, 22 Aug 2019 23:42:59 GMT"), y: 172965 },
-            //         { x: new Date("Thu, 22 Aug 2019 23:43:10 GMT"), y: 173513 }
-            //     ]
-            // }
-
-            var chart = new CanvasJS.Chart("chartContainer", {
-                animationEnabled: true,
+        // Creates CanvasJS graph
+        let chart;
+        getStreamData().then(function (stream_data) {
+            // Creates & renders chart
+            chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: false,
                 title: {
                     text: "Top Twitch Streams"
                 },
@@ -87,18 +79,15 @@
                 axisX: {
                     title: "Date and Time",
                 },
-                data: [rank_data]
+                data: stream_data
             });
             chart.render();
-        })
 
-        // getRankDict()
-
-        window.onload = function () {
-
-
-
-        }
+            // Updates graph every 10 seconds
+            setInterval(function () {
+                updateGraph();
+            }, 10000);
+        });
     </script>
 </body>
 
