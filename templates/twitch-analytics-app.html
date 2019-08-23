@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.min.js"></script>
+
+
+</head>
+
+<body>
+    TEST
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+
+
+    <script>
+        // function getRankDict() {
+        //     $.get("/project/twitch-analytics/api/get-stream-data", function onSuccess(data, status) {
+        //         datapoints = []
+        //         for (let i = 0; i < data["1"].length; i++) {
+        //             let numViewers = data["1"][i][0];
+        //             let timestamp = data["1"][i][3];
+        //             console.log(`${numViewers}, ${timestamp}`)
+        //             datapoints.push({ x: new Date(timestamp), y: numViewers });
+
+        //             if (i === 25) {
+        //                 break
+        //             }
+        //         }
+        //         console.log(datapoints)
+        //         console.log(datapoints[0])
+        //         console.log(datapoints[1])
+        //         console.log(datapoints[2])
+        //     });
+        // }
+
+        function getRankDict() {
+            return new Promise((resolve, reject) => {
+                $.get("/project/twitch-analytics/api/get-stream-data", function onSuccess(data, status) {
+                    resolve(data);
+                })
+            })
+        }
+
+        getRankDict().then(function (data) {
+            // console.log(data)
+
+            // let rank_data = 
+            let rank_data = {
+                yValueFormatString: "###,###,### Viewers",
+                xValueFormatString: "HH:mmtt K MMMM DD, YYYY",
+                type: "spline",
+                dataPoints: []
+            }
+            for (let i = 0; i < data["1"].length; i++) {
+                // console.log(data["1"][i])
+                let viewerCount = data["1"][i][0];
+                let timestamp = data["1"][i][3];
+                console.log(`${viewerCount}, ${timestamp}`);
+                rank_data["dataPoints"].push({ x: new Date(timestamp), y: viewerCount });
+            }
+            console.log(rank_data);
+
+            // let rank_data = {
+            //     yValueFormatString: "###,###,### Viewers",
+            //     xValueFormatString: "HH:mmtt K MMMM DD, YYYY",
+            //     type: "spline",
+            //     dataPoints: [
+            //         { x: new Date("Thu, 22 Aug 2019 23:42:59 GMT"), y: 172965 },
+            //         { x: new Date("Thu, 22 Aug 2019 23:43:10 GMT"), y: 173513 }
+            //     ]
+            // }
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                title: {
+                    text: "Top Twitch Streams"
+                },
+                axisY: {
+                    title: "Number of Viewers",
+                },
+                axisX: {
+                    title: "Date and Time",
+                },
+                data: [rank_data]
+            });
+            chart.render();
+        })
+
+        // getRankDict()
+
+        window.onload = function () {
+
+
+
+        }
+    </script>
+</body>
+
+</html>
