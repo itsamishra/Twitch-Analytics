@@ -1,7 +1,7 @@
 from pypika import Query, Order
 import psycopg2
 
-
+# Returns all stream records
 def get_all_stream_data(twitch_analytics_secrets):
     get_query = (
         Query.from_("stream_data")

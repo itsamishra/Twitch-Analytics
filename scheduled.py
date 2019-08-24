@@ -18,7 +18,11 @@ def schedule_scripts(secret_dict):
     schedule.every(10).seconds.do(
         get_twitch_viewership_data, twitch_analytics_secrets=twitch_analytics_secrets
     )
-    # delete_old_stream_data()
+    # Schedules deletion of old records
+    schedule.every(10).seconds.do(
+        delete_old_stream_data, twitch_analytics_secrets=twitch_analytics_secrets
+    )
+    # delete_old_stream_data(twitch_analytics_secrets)
 
     # Runs schedule
     while True:
@@ -77,11 +81,26 @@ def get_twitch_viewership_data(twitch_analytics_secrets):
 
 
 # Deletes stream data that's over 1 day old
-def delete_old_stream_data():
+def delete_old_stream_data(twitch_analytics_secrets):
     timestamp = datetime.datetime.now() - datetime.timedelta(days=1)
 
+    # Creates sql query
     stream_data = Table("stream_data")
     delete_query = (
-        Query.from_(stream_data).delete().where(stream_data.log_time < timestamp)
+        Query.from_(stream_data)
+        .delete()
+        .where(stream_data.log_time < timestamp)
+        .get_sql()
     )
-    print(delete_query)
+
+    # Executes SQL query
+    conn = psycopg2.connect(
+        twitch_analytics_secrets["postgres-connection-url"], sslmode="require"
+    )
+    cur = conn.cursor()
+    cur.execute(delete_query)
+    conn.commit()
+
+    # Closes cursor and connection
+    cur.close()
+    conn.close()
