@@ -1,10 +1,3 @@
-# DONE: create function that grabs twitch data & run it every 10 seconds
-#   DONE: Make sure that data from function is stored in postgres
-#   DONE: Add function to scheduler that runs function every 10 seconds
-# DONE: Add function that delets all records >24 hours old
-# DONE: Add front end that uses stream data
-# DONE: Move workout-app secret from environment variable to secret.json
-
 from flask import Flask, render_template, jsonify
 from scheduled import *
 from selector import *

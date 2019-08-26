@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>mishra.io - Twitch Analytics</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.min.js"></script>
@@ -16,6 +16,7 @@
 <body>
     <div id="chartContainer" style="height: 370px; width: 100%;"></div>
 
+    <p id="updateDateTime"></p>
 
     <script>
         // Returns stream data
@@ -57,7 +58,6 @@
 
         // Updates graph
         function updateGraph() {
-            console.log("running updateGraph()...");
             getStreamData().then(function (stream_data) {
                 chart["options"]["data"] = stream_data;
                 chart.render();
@@ -71,7 +71,7 @@
             chart = new CanvasJS.Chart("chartContainer", {
                 animationEnabled: false,
                 title: {
-                    text: "Top Twitch Streams"
+                    text: "Top 10 Twitch Streams By Viewership"
                 },
                 axisY: {
                     title: "Number of Viewers",
@@ -82,11 +82,18 @@
                 data: stream_data
             });
             chart.render();
+            // Lets user know when graph was first made
+            let createdDateTime = new Date().toLocaleString();
+            $("#updateDateTime").text("Created At: " + createdDateTime);
 
             // Updates graph every 10 seconds
             setInterval(function () {
                 updateGraph();
-            }, 10000);
+
+                // Lets user know when grah was last updated
+                let updatedDateTime = new Date().toLocaleString();
+                $("#updateDateTime").text("Updated At: " + updatedDateTime);
+            }, 60000);
         });
     </script>
 </body>

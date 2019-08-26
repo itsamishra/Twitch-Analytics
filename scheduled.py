@@ -11,18 +11,16 @@ import time
 
 # Schedules functions to run at appropriate time intervals
 def schedule_scripts(secret_dict):
-    print("scheduling...")
     twitch_analytics_secrets = secret_dict["twitch-analytics"]
 
-    # Schedules insertion of twitch viewship data every 10 seconds
-    schedule.every(10).seconds.do(
+    # Schedules insertion of twitch viewship data every 60 seconds
+    schedule.every(60).seconds.do(
         get_twitch_viewership_data, twitch_analytics_secrets=twitch_analytics_secrets
     )
-    # Schedules deletion of old records
-    schedule.every(10).seconds.do(
+    # Schedules deletion of old records every hour
+    schedule.every(1).hour.do(
         delete_old_stream_data, twitch_analytics_secrets=twitch_analytics_secrets
     )
-    # delete_old_stream_data(twitch_analytics_secrets)
 
     # Runs schedule
     while True:
@@ -32,7 +30,6 @@ def schedule_scripts(secret_dict):
 
 # Retreives top 20 streams from Twitch API and inserts them into db
 def get_twitch_viewership_data(twitch_analytics_secrets):
-    print("getting data...")
     endpoint = "https://api.twitch.tv/helix/streams?first=10"
     headers = {"Client-Id": twitch_analytics_secrets["twitch-client-id"]}
     top_streams = []
