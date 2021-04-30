@@ -17,5 +17,5 @@ rope==0.14.0
 schedule==0.6.0
 simplejson==3.16.0
 toml==0.10.0
-urllib3==1.25.3
+urllib3==1.25.8
 Werkzeug==0.15.5
